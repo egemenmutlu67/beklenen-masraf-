@@ -8,9 +8,15 @@ st.set_page_config(page_title="Evin Masrafını Hesap Etme", layout="centered")
 st.title("🏠 Evin Masrafını Hesap Etme")
 st.write("Aşağıdaki bilgileri doldurarak evin sigorta masrafını tahmin edebilirsiniz.")
 
-# Kullanıcının masaüstü dizinini alma
-desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
-file_path = os.path.join(desktop_path, "insurance_modified.csv")
+# GitHub URL'si
+url = "https://raw.githubusercontent.com/kullanici_adiniz/repository_adiniz/main/insurance_modified.csv"
+
+# GitHub'dan dosyayı doğrudan okuma
+try:
+    df = pd.read_csv(url, delimiter=";")
+    st.write("Veri başarıyla yüklendi!")
+except Exception as e:
+    st.error(f"Veri yüklenirken bir hata oluştu: {e}")
 
 # Kullanıcıdan giriş al
 ev_durumu = st.selectbox("Ev Durumu", ["Ev Sahibi", "Kiralık"])
@@ -65,16 +71,15 @@ else:
     input_processed = input_processed[model_columns]
 
     # Veriyi yükle
-    if os.path.exists(file_path):
-        df = pd.read_csv(file_path, delimiter=";")
+    if 'Masraf' in df.columns:
+        toplam_masraf = df["Masraf"].sum()
 
-        # Beklenen masrafı hesapla
         if st.button("Beklenen Masraf Tutarı"):
             tahmini_masraf = model.predict(input_processed)[0]
-            beklenen_tutar = tahmini_masraf * teminat_bedeli  # Masraf ile teminat bedelini çarpıyoruz
+            beklenen_tutar = tahmini_masraf * teminat_bedeli
 
             # Sonuçları göster
-            st.write(f"**Beklenen Masraf Oranı:** {tahmini_masraf:,.4f}")  # Beklenen masraf oranını gösteriyoruz
+            st.write(f"**Beklenen Masraf Oranı:** {tahmini_masraf:,.2f}")
             st.success(f"💸 Beklenen Masraf Tutarı: {beklenen_tutar:,.2f} ₺")
     else:
-        st.error(f"'{file_path}' dosyası bulunamadı. Lütfen doğru dosyayı masaüstünüzde bulundurduğunuzdan emin olun.")
+        st.error(f"Veri kümesinde 'Masraf' sütunu bulunamadı. Lütfen veriyi kontrol edin.")
