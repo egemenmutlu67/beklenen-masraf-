@@ -68,7 +68,7 @@ try:
             tahmini_masraf = model.predict(input_processed)[0]
             beklenen_tutar = tahmini_masraf * teminat_bedeli
 
-            st.write(f"**Masraf:** {tahmini_masraf:,.2f} ₺")
+            st.write(f"**Beklenen Masraf Oranı:** {tahmini_masraf:,.4f}")
             st.success(f"💸 Beklenen Masraf Tutarı: {beklenen_tutar:,.2f} ₺")
     except FileNotFoundError:
         st.error(f"'{file_path}' dosyası bulunamadı. Lütfen bu dosyanın uygulama klasöründe olduğundan emin olun.")
